@@ -20,15 +20,23 @@
 
 // initialize the library with the numbers of the interface pins
 LiquidCrystal lcd(12, 11, 5, 4, 3, 2);
+
+#define DHTPIN 8     //DHT Sensor Input pin
+#define DHTTYPE DHT11   
+DHT dht(DHTPIN, DHTTYPE);
+
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 
 void setup() {
-    Serial.begin(9600);
+   Serial.begin(9600);
   // set up the LCD's number of columns and rows:
   lcd.begin(16, 2);
+  //Start DHTSensor
+  dht.begin();
   // Print a message to the LCD.
   initLCD();
+  delay(5000); //delay 5 seconds then clear lcd
 }
 
 void loop() {
@@ -47,6 +55,19 @@ void loop() {
       stringComplete = false;
     }
   }
+  // Read Humidity
+  int h = dht.readHumidity();
+  // Read temperature as Celsius
+  int t = dht.readTemperature();
+  // Check if any reads failed and exit early (to try again).
+  if (isnan(h) || isnan(t)) {
+    lcd.print("Failed to read sensor!");
+    return;
+  }
+  else{
+    displayTemp(t,h);
+  }
+  delay(1000);
 }
 
 
@@ -63,6 +84,14 @@ void serialEvent() {
 ///////////////////////////////////////////////////////////////////////
 void initLCD(){
     lcd.clear();
-    lcd.print("Control System");
+    lcd.print("Control Panel");
     lcd.setCursor(0, 1);
+}
+void displayTemp(int temp, int hud){
+  initLCD();
+  lcd.print("T:");
+  lcd.print(temp);
+  lcd.print("*C H:");
+  lcd.print(hud);
+  lcd.print("%");
 }
