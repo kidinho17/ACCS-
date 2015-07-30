@@ -26,7 +26,7 @@ void setup() {
 
 void loop() {
   // put your main code here, to run repeatedly:
-  DateTime now = rtc.now();
+  /*DateTime now = rtc.now();
   Serial.print(now.year(), DEC);
   Serial.print('/');
   Serial.print(now.month(), DEC);
@@ -38,6 +38,20 @@ void loop() {
   Serial.print(now.minute(), DEC);
   Serial.print(':');
   Serial.print(now.second(), DEC);
-  Serial.println();
+  Serial.println();*/
+  
+  Serial.println(getTime());
   delay(1000);
+}
+
+String getTime(){
+  DateTime now = rtc.now();
+  String strYear = String(now.year());
+  String strMonth = String(now.month());
+  String strDay = String(now.day());
+  String strHour = String(now.hour());
+  String strMinutes = String(now.minute());
+  String strSeconds = String(now.second());
+
+  return strYear + ("/") + strMonth+ ("/") + strDay+ (" ") + strHour+ (":") + strMinutes+ (":") + strSeconds;
 }
