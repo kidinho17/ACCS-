@@ -39,5 +39,5 @@ void loop() {
   Serial.print(':');
   Serial.print(now.second(), DEC);
   Serial.println();
-    
+  delay(1000);
 }
