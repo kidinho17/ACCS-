@@ -60,7 +60,8 @@ Adafruit_CC3000 cc3000 = Adafruit_CC3000(ADAFRUIT_CC3000_CS, ADAFRUIT_CC3000_IRQ
 String inputString = "";         // a string to hold incoming data
 boolean stringComplete = false;  // whether the string is complete
 
-unsigned long int intMin = 0, old_intMin = 0;
+unsigned long int intTime = 0, old_intTime = 0;
+int counter = 0;
 
 void setup() {
    Serial.begin(9600);
@@ -126,12 +127,19 @@ void loop() {
   }
   delay(1000);
 
-  /*time to upload data
-  if(intMin != old_intMin ){
-     old_intMin = intMin;
-     String d = "/ACCS_Web/add.php?t=" + String("1") + "&h=" + String("1") + "&l=" + String("1") + "&fs=" + String("1") + "&date=" + getDate() + "&time="+ getTime1();
-     uploadData(d, d.length());
-  }*/
+  //time to upload data //1 min interval
+  intTime = millis();
+  int interval = intTime-old_intTime;
+  if (interval > 30000)    
+  {
+    counter++;
+    old_intTime = intTime;
+  }
+  if(counter == 2){
+    counter = 0;
+    String d = "/ACCS_Web/add.php?t=" + String("1") + "&h=" + String("1") + "&l=" + String("1") + "&fs=" + String("1") + "&date=" + getDate() + "&time="+ getTime1();
+    uploadData(d, d.length());
+  }
 
 }
 ///////////////////////////////////////////////////////////////////////
@@ -143,7 +151,8 @@ void displayTemp(int temp, int hud, String tm){
   lcd.print(temp);
   lcd.print("*C H:");
   lcd.print(hud);
-  lcd.print("%");
+  lcd.print("% L:");
+  lcd.print("0");
 }
 
 String getTime() {
@@ -154,8 +163,7 @@ String getTime() {
   String strHour = String(now.hour());
   String strMinutes = String(now.minute());
   String strSeconds = String(now.second());
-  intMin = now.minute();
- 
+  
   return strDay + ("-") + strMonth + ("-") + strYear.substring(2,4) + (" ") + strHour+ (":") + strMinutes+ (":") + strSeconds;
 }
 String getDate() {
@@ -194,7 +202,8 @@ void uploadData(String d, int l){
     lcd.clear();
     lcd.print("Connection to"); 
     lcd.setCursor(0,1);
-    lcd.print("server failed");    
+    lcd.print("server failed");
+    delay(10000);    
     return;
   }
   
@@ -210,29 +219,3 @@ void uploadData(String d, int l){
   www.close();  
   cc3000.disconnect();
 }
-/*================================= Junk Code ============================
-  /*if(stringComplete){
-    if(inputString == "clear" || inputString == "Clear" ||
-    inputString == "CLEAR" || inputString == "clr"){
-      lcd.clear();
-    }
-    else{
-      lcd.clear();
-      lcd.print(inputString);
-      inputString = "";
-      stringComplete = false;
-    }
-  }
-  
-  
-
-void serialEvent() {
-  while (Serial.available()) {
-    char inChar = Serial.read(); 
-    if(inChar == ';'){
-      stringComplete = true;
-    }
-    else inputString += inChar;
-  }
-}
-================================= Junk Code ===============================*/
